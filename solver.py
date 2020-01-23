@@ -2,7 +2,8 @@
 #python solver.py 4 0:2 1:1 5:3 6:2 11:4 12:1
 #http://www.sudoku-download.net/files/60_Sudokus_4x4_Easy.pdf     http://www.sudoku-download.net/files/Solution_60_Sudokus_4x4_Easy.pdf
 import sys;
-
+import math;
+userIsStupid = False; #input error handling
 #input prefilled cells in standard format position:value
 print("input: ");
 print(sys.argv);
@@ -12,7 +13,7 @@ size = int(sys.argv[1]);
 size_sum = int(((size**2)+size)/2);
 
 #############################################################################
-#create master array length=81 with each item being its own array 0-8
+#create master array length=size^2 with each item being its own array 0-size
 #array reads left to right top to bottom 
 #this array shows possible values for each cell and values should only be removed if absolutely sure
 master_array=[];
@@ -35,9 +36,26 @@ for i in range(2,len(sys.argv)):
 print(master_array);
 
 #############################################################################
-#TODO:remove input value from other cells based on col, row, square
-#similar to function above but calculate row column and square from input and remove value from those things
+#TODO:remove input value from other cells based on square
+#similar to function above but calculates row column and square from input and remove value from those things
+for i in range(2,len(sys.argv)):
+    pos = int(sys.argv[i].split(":")[0]);
+    value = int(sys.argv[i].split(":")[1]);
+    row = math.floor(pos/size);
+    col = pos%size;
+    for j in range(0,size):
+        if len(master_array[row*size+j]) > 1:
+            try:
+                master_array[row*size+j].remove(value);
+            except:
+                pass;
+        if len(master_array[col+size*j]) > 1:
+            try:
+                master_array[col+size*j].remove(value);
+            except:
+                pass;
 
+print(master_array);
 
 #############################################################################
 #array that temporarily hold possible solution to be checked
@@ -48,7 +66,7 @@ for i in range(0,size**2):
 
 #############################################################################
 temp_solution = [2,1,4,3,4,3,2,1,3,2,1,4,1,4,3,2];
-#TODO:checker function
+#TODO:checker function check columns and square
 def checker(checkerarray): #input test array as local variable?
     isvalid = True;
     if checkerarray == temp_solution:
@@ -85,8 +103,8 @@ def func(tier):
         
             passthru =  tier+1;
             func(passthru);
-
-func(0);
+if userIsStupid == False:
+    func(0);
 print("solution:");
 print(solution_array);
 print("end");
