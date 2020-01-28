@@ -6,12 +6,17 @@ import sys;
 import math;
 userIsStupid = False; #input error handling
 #input prefilled cells in standard format position:value
-print("input: ");
+print("Input: ");
 print(sys.argv);
 
 if (math.sqrt(int(sys.argv[1])))%1 != 0 or int(sys.argv[1]) < 1:
     userIsStupid = True;
-    print("input size is invalid. i.e. not square or less than one");
+    print("Input size is invalid. i.e. not square or less than one");
+if int(sys.argv[1]) == 4 and len(sys.argv) < 6:
+    print("Number of givens is below minimum value to guarentee one solution. Multiple solutions will be outputted.");
+if int(sys.argv[1]) == 9 and len(sys.argv) < 19:
+    print("Number of givens is below minimum value to guarentee one solution. Multiple solutions will be outputted.");
+#add more for 16x16 etc...
 
 #sudoku grid size i.e. 4x4 9x9 16x16 etc.
 size = int(sys.argv[1]);
@@ -77,7 +82,7 @@ print(master_array);
 wcs = 1; #calculates worst case senario number of iterations/combination the programs will have to search for a potential solution
 for x in range(0,len(master_array)):
    wcs *= len(master_array[x]);
-print("worst case senario:");
+print("worst case senario number of possibilities to check:");
 print(wcs);
 
 #############################################################################
