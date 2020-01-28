@@ -88,33 +88,43 @@ for i in range(0,size**2):
 #print(testarray);
 
 #############################################################################
-#temp_solution = [2,1,4,3,4,3,2,1,3,2,1,4,1,4,3,2];
-#TODO:checker function check square
+temp_solution = [3,2,4,1,1,4,3,2,2,3,1,4,4,1,2,3];
+#TODO:check for duplicates
 def checker(checkerarray): #function to check if col row and square are valid
     isvalid = True;
-    #if checkerarray == temp_solution:
-        #solution_array.extend(checkerarray);
+    if checkerarray == temp_solution:
+        print("solution here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
     for i in range(0,size):
-        if sum(checkerarray[i*size:i*size+size]) != size_sum: #check if rows are valid
+        if sum(checkerarray[i*size:i*size+size]) != size_sum or len(checkerarray[i*size:i*size+size]) != len(set(checkerarray[i*size:i*size+size])): #check if row has valid sum and no dups
             isvalid = False;
-            #print("solution failed");
             break;
-        #else:
-            #print("row solution succeeded!");
-        colsum = 0;
+
+        col_list = [];
         for j in range(0,size):
-          colsum += testarray[i+j*size];
-        if colsum != size_sum:
+          col_list.append(testarray[i+j*size]);
+        if sum(col_list) != size_sum or len(col_list) != len(set(col_list)): #check if column has valid sum and no dups
             isvalid = False;
             break;
-    #TODO:check squares
+        
+        #this code is just modified from above, which violates DRY
+        sqr_list = [];
+        row = i//sqrt_size;
+        col = i%sqrt_size;
+        thing = int(col*sqrt_size + row*math.pow(sqrt_size,3));
+        for k in range(0,sqrt_size):
+            for m in range(0,sqrt_size):
+                sqr_list.append(checkerarray[(k*size+m)+thing]);
+        if sum(sqr_list) != size_sum or len(sqr_list) != len(set(sqr_list)): #check if square has valid sum
+            isvalid = False;
+            break;
+
     return isvalid;
 
 ################################################################################
 #recursive function that goes through evey possible combination of solutions
 def func(tier):
-    if tier >=size**2:
+    if tier >= size**2:
         #print(testarray); #test function will go here
         if checker(testarray) == True:
             print("potential solution:");
@@ -128,11 +138,9 @@ def func(tier):
             #print(tier);
             testarray[tier] = master_array[tier][i];
         
-            passthru =  tier+1;
+            passthru = tier+1;
             func(passthru);
             
 if userIsStupid == False:
     func(0);
-#print("solution:");
-#print(solution_array);
 print("end");
