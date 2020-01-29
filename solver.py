@@ -9,8 +9,12 @@
 import sys;
 import math;
 userIsStupid = False; #input error handling
+verbosePrinting = False;
 #input prefilled cells in standard format position:value
-given_array = sys.argv[2:];
+if len(sys.argv) > 2:
+    given_array = sys.argv[2:];
+else:
+    userIsStupid = True;
 print("Input: ", end="");
 print(given_array); #TODO: fix bug where program crashes if no givens are provided
 
@@ -33,13 +37,13 @@ size_sum = int(((size**2)+size)/2);
 #array reads left to right top to bottom 
 #this array shows possible values for each cell and values should only be removed if absolutely sure
 master_array=[];
-solution_array=[];
 for i in range(size**2): #81=number of cells in sudoku
     sub = [];
     for j in range(1,size+1): #populate with possible values 1-9
         sub.append(j);
     master_array.append(sub);
-#print(master_array);
+if verbosePrinting == True:
+    print("initial creation of master array:",master_array);
 
 #############################################################################
 #remove all but input value from appropriate cell in master array
@@ -47,7 +51,8 @@ def elim_all_but_given():
     for i in given_array:
         pos = int(i.split(":")[0]);
         value = int(i.split(":")[1]);
-        #print(str(pos) +":"+ str(value)); #TODO: print in grid format
+        if verbosePrinting == True:
+            print(str(pos) +":"+ str(value)); #TODO: print in grid format
         master_array[pos] = list(filter(lambda x: x==value, master_array[pos]));
 
 #############################################################################
@@ -92,23 +97,22 @@ def initial_clearing(): #this function recursively calls the elim functions unti
     for x in range(0,size**2):
         if len(master_array[x]) == 1:
            temp_given_array.append(str(x)+":"+str(master_array[x][0]));
-    #print("temp: ");
-    #print(temp_given_array);
+    if verbosePrinting == True:
+        print("temp: ");
+        print(temp_given_array);
     if temp_given_array == given_array:
         return;
     else:
         given_array = temp_given_array;
         initial_clearing();
-initial_clearing();
 
-print("possibilities: ");
-print(master_array);
 ############################################################################
-wcs = 1; #calculates worst case senario number of iterations/combination the programs will have to search for a potential solution
-for x in range(0,len(master_array)):
-   wcs *= len(master_array[x]);
-print("worst case senario number of possibilities to check: ", end="");
-print(wcs);
+def worst_case_senario ():
+    wcs = 1; #calculates worst case senario number of iterations/combination the programs will have to search for a potential solution
+    for x in range(0,len(master_array)):
+        wcs *= len(master_array[x]);
+    print("worst case senario number of possibilities to check: ", end="");
+    print(wcs);
 
 #############################################################################
 #array that temporarily hold possible solution to be checked
@@ -145,7 +149,7 @@ def checker(checkerarray): #function to check if col row and square are valid
         for k in range(0,sqrt_size):
             for m in range(0,sqrt_size):
                 sqr_list.append(checkerarray[(k*size+m)+thing]);
-        if sum(sqr_list) != size_sum or len(sqr_list) != len(set(sqr_list)): #check if square has valid sum
+        if sum(sqr_list) != size_sum or len(sqr_list) != len(set(sqr_list)): #check if square has valid sum and no dups
             isvalid = False;
             break;
 
@@ -174,8 +178,12 @@ def func(tier):
             func(passthru);
             
 if userIsStupid == False:
+    initial_clearing();
+    print("possibilities: ");
+    print(master_array);
+    worst_case_senario();
     func(0);
-#print("");
-#print(solution_counter, end="");
-#print(" solution(s) found");
+    print("");
+    print(solution_counter, end="");
+    print(" solution(s) found");
 print("end");
