@@ -1,7 +1,8 @@
 #sudoku solver        worst case senario it takes 6.2350029e+60 (6 Novemdecillion) years
 #python solver.py 4 0:2 1:1 5:3 6:2 11:4 12:1
-#https://www.websudoku.com/?level=1&set_id=1818407932  python solver.py 9 6:2 8:1 10:6 14:3 17:7 18:7 20:8 21:4 24:5 27:2 29:3 30:6 32:9 33:1 34:7 37:7 38:6 40:1 42:3 43:4 46:8 47:1 48:3 50:2 51:9 53:6 56:4 59:6 60:7 62:5 63:5 66:1 70:9 72:6 74:2
-#https://www.websudoku.com/?level=4&set_id=2698854159  python solver.py 9 1:7 2:8 4:5 11:5 13:8 15:2 18:6 19:2 23:9 25:1 30:7 34:4 38:7 42:3 46:1 50:2 55:9 57:6 61:3 62:1 65:1 67:2 69:4 76:9 78:5 79:8
+#easy https://www.websudoku.com/?level=1&set_id=1818407932  python solver.py 9 6:2 8:1 10:6 14:3 17:7 18:7 20:8 21:4 24:5 27:2 29:3 30:6 32:9 33:1 34:7 37:7 38:6 40:1 42:3 43:4 46:8 47:1 48:3 50:2 51:9 53:6 56:4 59:6 60:7 62:5 63:5 66:1 70:9 72:6 74:2
+#medium https://www.websudoku.com/?level=2&set_id=2942337575 python solver.py 9 1:1 3:3 8:7 11:8 13:2 15:5 19:9 20:7 21:6 22:8 23:4 26:1 29:6 30:8 37:4 43:3 50:2 51:1 54:3 57:4 58:7 59:8 60:9 61:1 65:2 67:5 69:7 72:7 77:3 79:5
+#evil https://www.websudoku.com/?level=4&set_id=2698854159  python solver.py 9 1:7 2:8 4:5 11:5 13:8 15:2 18:6 19:2 23:9 25:1 30:7 34:4 38:7 42:3 46:1 50:2 55:9 57:6 61:3 62:1 65:1 67:2 69:4 76:9 78:5 79:8
 #http://www.sudoku-download.net/sudoku_4x4.php
 #TODO: hidden singles aka values with 2 possibilities that can be quickly eliminated
 #TODO: used naked pair to eliminate those 2 possibilities from the rest of the row/col/sqr
@@ -52,7 +53,7 @@ def elim_all_but_given():
         pos = int(i.split(":")[0]);
         value = int(i.split(":")[1]);
         if verbosePrinting == True:
-            print(str(pos) +":"+ str(value)); #TODO: print in grid format
+            print(str(pos) +":"+ str(value)); #TODO: print in grid format maybe
         master_array[pos] = list(filter(lambda x: x==value, master_array[pos]));
 
 #############################################################################
@@ -109,10 +110,19 @@ def initial_clearing(): #this function recursively calls the elim functions unti
 ############################################################################
 def worst_case_senario ():
     wcs = 1; #calculates worst case senario number of iterations/combination the programs will have to search for a potential solution
+    amount = 0; unit = 0; unit_array = ["year(s)","day(s)","hour(s)","minute(s)","second(s)"];
     for x in range(0,len(master_array)):
         wcs *= len(master_array[x]);
     print("worst case senario number of possibilities to check: ", end="");
     print(wcs);
+                    #year                       day                hour              min         sec
+    time_array = [wcs/100000/60/60/24/356,wcs/100000/60/60/24,wcs/100000/60/60,wcs/100000/60,wcs/100000];
+    for t in range(0,len(time_array)):
+        if time_array[t] > 1:
+           amount = time_array[t];
+           unit = t;
+           break;
+    print("estimated time to completion:", amount, unit_array[unit]);
 
 #############################################################################
 #array that temporarily hold possible solution to be checked
