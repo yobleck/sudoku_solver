@@ -3,10 +3,13 @@ WIP
 
 Usage:
 $python solver.py 9 0:1 5:9 80:4
+
 9=size (can be 1,4,9,16,25...)
 
-given format: x:y 
+given format: x:y
+
 x is the position starting with 0 in the top left and reading left to right top to bottom with 80 at the bottom right
+
 y is the value of the given from 1-9
 
 Mainly tested on 4x4 not 9x9.
