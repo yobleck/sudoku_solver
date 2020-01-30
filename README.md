@@ -23,6 +23,8 @@ on 4x4 if can test ~100,000 possibilies in a couple of seconds I think.
 
 todo:
 
+check input to makes sure it is actually valid
+
 naked/hidden pairs/triplets/quadruplets
 
 multithreading
