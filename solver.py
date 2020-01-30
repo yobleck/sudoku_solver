@@ -13,11 +13,10 @@ userIsStupid = False; #input error handling
 verbosePrinting = False;
 #input prefilled cells in standard format position:value
 if len(sys.argv) > 2:
-    given_array = sys.argv[2:];
+    given_array = sys.argv[2:]; #TODO: check gien array to make sure it is even valid (has no typos)
 else:
     userIsStupid = True;
-print("Input: ", end="");
-print(given_array); #TODO: fix bug where program crashes if no givens are provided
+print("Input:", given_array); #TODO: fix bug where program crashes if no givens are provided
 
 if (math.sqrt(int(sys.argv[1])))%1 != 0 or int(sys.argv[1]) < 1:
     userIsStupid = True;
@@ -29,16 +28,14 @@ if int(sys.argv[1]) == 9 and len(sys.argv) < 19:
 #add more for 16x16 etc...
 
 #sudoku grid size i.e. 4x4 9x9 16x16 etc.
-size = int(sys.argv[1]);
-sqrt_size = int(math.sqrt(size));
-size_sum = int(((size**2)+size)/2);
+size = int(sys.argv[1]); sqrt_size = int(math.sqrt(size)); size_sqrd = size**2; size_sum = int(((size_sqrd)+size)/2);
 
 #############################################################################
 #create master array length=size^2 with each item being its own array length 0 to size
 #array reads left to right top to bottom 
 #this array shows possible values for each cell and values should only be removed if absolutely sure
 master_array=[];
-for i in range(size**2): #81=number of cells in sudoku
+for i in range(size_sqrd): #81=number of cells in 9x9 sudoku
     sub = [];
     for j in range(1,size+1): #populate with possible values 1-9
         sub.append(j);
@@ -95,12 +92,11 @@ def initial_clearing(): #this function recursively calls the elim functions unti
     elim_all_but_given();
     elim_given_from_other();
     temp_given_array = [];
-    for x in range(0,size**2):
+    for x in range(0,size_sqrd):
         if len(master_array[x]) == 1:
            temp_given_array.append(str(x)+":"+str(master_array[x][0]));
     if verbosePrinting == True:
-        print("temp: ");
-        print(temp_given_array);
+        print("temp:", temp_given_array);
     if temp_given_array == given_array:
         return;
     else:
@@ -110,13 +106,12 @@ def initial_clearing(): #this function recursively calls the elim functions unti
 ############################################################################
 def worst_case_senario ():
     wcs = 1; #calculates worst case senario number of iterations/combination the programs will have to search for a potential solution
-    amount = 0; unit = 0; unit_array = ["year(s)","day(s)","hour(s)","minute(s)","second(s)"];
+    amount = 0; unit = 0; unit_array = ["year(s)","day(s)","hour(s)","minute(s)","second(s)","millisecond(s)"];
     for x in range(0,len(master_array)):
         wcs *= len(master_array[x]);
-    print("worst case senario number of possibilities to check: ", end="");
-    print(wcs);
-                    #year                       day                hour              min         sec
-    time_array = [wcs/100000/60/60/24/356,wcs/100000/60/60/24,wcs/100000/60/60,wcs/100000/60,wcs/100000];
+    print("worst case senario number of possibilities to check:", wcs);
+                    #year                       day                hour              min         sec      ms
+    time_array = [wcs/500000/60/60/24/356,wcs/500000/60/60/24,wcs/500000/60/60,wcs/500000/60,wcs/500000,wcs/500]; #500000 is based on single thread ryzen 3700x
     for t in range(0,len(time_array)):
         if time_array[t] > 1:
            amount = time_array[t];
@@ -127,7 +122,7 @@ def worst_case_senario ():
 #############################################################################
 #array that temporarily hold possible solution to be checked
 testarray = [];
-for i in range(0,size**2):
+for i in range(0,size_sqrd):
     testarray.append(master_array[i][0]);
 #print(testarray);
 
@@ -151,7 +146,7 @@ def checker(checkerarray): #function to check if col row and square are valid
             isvalid = False;
             break;
         
-        #this code is just modified from above, which violates DRY
+        #this code is just modified from elim_given_from_other, which violates DRY
         sqr_list = [];
         row = i//sqrt_size;
         col = i%sqrt_size;
@@ -168,8 +163,8 @@ def checker(checkerarray): #function to check if col row and square are valid
 ################################################################################
 #recursive function that goes through evey possible combination of solutions
 solution_counter = 0;
-def func(tier):
-    if tier >= size**2:
+def brute_force(tier):
+    if tier >= size_sqrd:
         if checker(testarray) == True:
             print("potential solution:");
             for x in range(0,size):
@@ -185,15 +180,14 @@ def func(tier):
             testarray[tier] = master_array[tier][i];
         
             passthru = tier+1;
-            func(passthru);
+            brute_force(passthru);
             
 if userIsStupid == False:
     initial_clearing();
-    print("possibilities: ");
+    print("possibilities:");
     print(master_array);
     worst_case_senario();
-    func(0);
+    brute_force(0);
     print("");
-    print(solution_counter, end="");
-    print(" solution(s) found");
+    print(solution_counter, "solution(s) found");
 print("end");
