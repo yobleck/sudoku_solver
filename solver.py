@@ -6,14 +6,14 @@
 #http://www.sudoku-download.net/sudoku_4x4.php
 #TODO: hidden singles aka values with 2 possibilities that can be quickly eliminated
 #TODO: used naked pair to eliminate those 2 possibilities from the rest of the row/col/sqr
-#TODO: remove sum check on row/col/sqr? might only need len(set())
+#TODO: add log to file
 import sys;
 import math;
 userIsStupid = False; #input error handling
 verbosePrinting = False;
 #input prefilled cells in standard format position:value
 if len(sys.argv) > 2:
-    given_array = sys.argv[2:]; #TODO: check gien array to make sure it is even valid (has no typos)
+    given_array = sys.argv[2:]; #TODO: check given array to make sure it is even valid (has no typos)
 else:
     userIsStupid = True;
 print("Input:", given_array); #TODO: fix bug where program crashes if no givens are provided
@@ -52,7 +52,7 @@ def elim_all_but_given():
         if verbosePrinting == True:
             print(str(pos) +":"+ str(value)); #TODO: print in grid format maybe
         master_array[pos] = list(filter(lambda x: x==value, master_array[pos]));
-
+#elim_all_but_given();
 #############################################################################
 #similar to function above but calculates row column and square from input and remove value from those things
 def elim_given_from_other():
@@ -83,7 +83,23 @@ def elim_given_from_other():
                         master_array[(k*size+m)+sqr_thing].remove(value); #removes value from square
                     except:
                         pass;
-
+#elim_given_from_other();
+#############################################################################
+def naked_elim():
+    for subset in range(2,3): #naked pairs/triples/quads TODO:range(2,5)
+        for i in range(0,size): #copying checker function violate dry but the outputs are different enought that i dont want to jut make one function to handle every case like this atleast for now
+            nak_row = [];
+            nak_row.append(master_array[i*size : i*size+size]);
+            #print(nak_row);
+            for j in range(0,size):
+                #print(nak_row[0][j]);
+                if len(nak_row[0][j]) == subset:
+                    #print("almost");
+                    if nak_row[0].count(nak_row[0][j]) > 1:
+                        print("succ");
+                        
+                
+#naked_elim();
 #############################################################################
 def initial_clearing(): #this function recursively calls the elim functions until the value of given_array stops changing
     #print("given");
@@ -103,7 +119,7 @@ def initial_clearing(): #this function recursively calls the elim functions unti
         given_array = temp_given_array;
         initial_clearing();
 
-############################################################################
+#############################################################################
 def worst_case_senario ():
     wcs = 1; #calculates worst case senario number of iterations/combination the programs will have to search for a potential solution
     amount = 0; unit = 0; unit_array = ["year(s)","day(s)","hour(s)","minute(s)","second(s)","millisecond(s)"];
@@ -135,14 +151,14 @@ def checker(checkerarray): #function to check if col row and square are valid
         print("solution here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
     for i in range(0,size):
-        if sum(checkerarray[i*size:i*size+size]) != size_sum or len(checkerarray[i*size:i*size+size]) != len(set(checkerarray[i*size:i*size+size])): #check if row has valid sum and no dups
+        if sum(checkerarray[i*size:i*size+size]) != size_sum or len(set(checkerarray[i*size:i*size+size])) != size: #check if row has valid sum and no dups
             isvalid = False;
             break;
 
         col_list = [];
         for j in range(0,size):
           col_list.append(testarray[i+j*size]);
-        if sum(col_list) != size_sum or len(col_list) != len(set(col_list)): #check if column has valid sum and no dups
+        if sum(col_list) != size_sum or len(set(col_list)) != size: #check if column has valid sum and no dups
             isvalid = False;
             break;
         
@@ -154,13 +170,13 @@ def checker(checkerarray): #function to check if col row and square are valid
         for k in range(0,sqrt_size):
             for m in range(0,sqrt_size):
                 sqr_list.append(checkerarray[(k*size+m)+thing]);
-        if sum(sqr_list) != size_sum or len(sqr_list) != len(set(sqr_list)): #check if square has valid sum and no dups
+        if sum(sqr_list) != size_sum or len(set(sqr_list)) != size: #check if square has valid sum and no dups
             isvalid = False;
             break;
 
     return isvalid;
 
-################################################################################
+#############################################################################
 #recursive function that goes through evey possible combination of solutions
 solution_counter = 0;
 def brute_force(tier):
@@ -184,8 +200,11 @@ def brute_force(tier):
             
 if userIsStupid == False:
     initial_clearing();
+    #naked_elim();
     print("possibilities:");
-    print(master_array);
+    for x in range(0,size):
+        print(master_array[x*size:x*size+size]);
+    #print(master_array);
     worst_case_senario();
     brute_force(0);
     print("");
